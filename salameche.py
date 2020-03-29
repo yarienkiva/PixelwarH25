@@ -8,6 +8,9 @@ from io import BytesIO
 from PIL import Image
 import requests
 
+# Attention, si l'image est trop grande le nombre de proofs ne sera jamais suffisant
+# Pour une image de 20x20 pixels 10 threads ne sont pas suffisant
+
 # Complètement comme on veut, il faut juste que l'image soit comprise dans le cadre
 X_OFFSET = 4
 Y_OFFSET = 24
@@ -22,7 +25,7 @@ baseImg = baseImg.convert('RGB')
 width, height = baseImg.size
 baseData = list(baseImg.getdata())
 
-pfile = open("/home/alol/Documents/proofs.txt", 'a+')
+pfile = open("/home/alol/CTF/proofs.txt", 'r+') # suce
 
 proofs = pfile.read().splitlines()
 proofs = set(proofs)
@@ -62,12 +65,12 @@ def pixelsetter():
 		time.sleep(60)
 
 # Calcule et cherche des hashs commençant par 000000
-def computer(i):
+def computer():
 	while True:
 		proof = 'alol' + ''.join([random.choice(string.ascii_letters + string.digits) for _ in range(25)])
 		if hashlib.sha256(('h25'+proof).encode()).hexdigest().startswith('00000'):
 			proofs.add(proof)
-			print('[+] Thread n°', i, 'found proof', proof)
+			print('[+] Thread found proof', proof)
 
 # sig handler, pour sauvegarder les proofs quand on quitte
 def signal_handler(sig, frame):
@@ -79,13 +82,9 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 print('[T] Starting pixelsetter')
-t = threading.Thread(target=pixelsetter)
-t.start()
+t1 = threading.Thread(target=pixelsetter)
+t1.start()
 
-miners = []
-nb_miners = 10
-
-for i in range(nb_miners):
-	print('[T] Starting computer', i)
-	miners.append(threading.Thread(target=computer, args=(i,)))
-	miners[i].start()
+print('[T] Starting computer')
+t2 = threading.Thread(target=computer)
+t2.start()
