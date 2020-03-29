@@ -22,7 +22,7 @@ baseImg = baseImg.convert('RGB')
 width, height = baseImg.size
 baseData = list(baseImg.getdata())
 
-pfile = open("/home/alol/Documents/proofs.txt", 'a+') # suce
+pfile = open("/home/alol/Documents/proofs.txt", 'a+')
 
 proofs = pfile.read().splitlines()
 proofs = set(proofs)
